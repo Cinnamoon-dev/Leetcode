@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -8,6 +9,19 @@ import java.util.List;
 // 3. group anagrams together in the same list
 
 public class Solution {
+    public static void main(String[] args) {
+        String[] strs = {"eat","tea","tan","ate","nat","bat"};
+        List<List<String>> lista = new Solution().groupAnagrams(strs);
+
+        for (List<String> list : lista) {
+            System.out.println("-----------------------------------------------------");
+            for (String string: list) {
+               System.out.println(string);
+            }
+            System.out.println("-----------------------------------------------------");
+        }
+    }
+
     public List<List<String>> groupAnagrams(String[] strs) {
         List<List<String>> groupedAnagrams = new ArrayList<List<String>>();
         HashMap<Integer, List<String>> groupedWords = new HashMap<Integer, List<String>>();
@@ -29,8 +43,23 @@ public class Solution {
         for(Integer length : groupedWords.keySet()) {
             List<String> sameSizeWords = groupedWords.get(length);
 
-            for (int i = 0; i < sameSizeWords.size(); i++) {
-                
+            // Testing each word and checking for anagrams in the entire array
+            while(sameSizeWords.size() > 0) {
+                String word = sameSizeWords.remove(0);
+
+                List<String> currentArrayAnagrams = new ArrayList<>();
+                currentArrayAnagrams.add(word);
+
+                for (int j = 0; j < sameSizeWords.size(); ) {
+                    if(isAnagram(word, sameSizeWords.get(j))) {
+                        currentArrayAnagrams.add(sameSizeWords.get(j));
+                        sameSizeWords.remove(j);
+                        continue;
+                    }
+                    j++;
+                }
+
+                groupedAnagrams.add(currentArrayAnagrams);
             }
         }
         
@@ -38,29 +67,15 @@ public class Solution {
     }
 
     public boolean isAnagram(String s, String t) {
-        HashMap<Character, Integer> characters = new HashMap<Character, Integer>();
+        char[] word = s.toCharArray();
+        char[] possibleAnagram = t.toCharArray();
 
-        for(char i : s.toCharArray()) {
-            if(!characters.containsKey(i)) {
-                characters.put(i, 1);
-                continue;
-            }
-
-            characters.put(i, characters.get(i) + 1);
-        }
-
-        for(char i : t.toCharArray()) {
-            if(!characters.containsKey(i)) {
-                return false;
-            }
-
-            characters.put(i, characters.get(i) - 1);
-        }
-
-        if(characters.values().stream().anyMatch((e) -> e > 0 || e < 0)) {
+        if(word.length != possibleAnagram.length) {
             return false;
         }
 
-        return true;
+        Arrays.sort(word);
+        Arrays.sort(possibleAnagram);
+        return Arrays.equals(word, possibleAnagram);
     }
 }
